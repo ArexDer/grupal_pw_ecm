@@ -1,12 +1,19 @@
 package grupal1_pw_ecm.uce.edu.web.api.controller;
 
-import grupal1_pw_ecm.uce.edu.web.api.repository.modelo.Archivo;
 import grupal1_pw_ecm.uce.edu.web.api.service.IArchivoService;
 import grupal1_pw_ecm.uce.edu.web.api.service.to.ArchivoTo;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.Link;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import org.jboss.resteasy.reactive.RestForm;
 
 @Path("/archivos")
 public class ArchivoController {
@@ -15,14 +22,35 @@ public class ArchivoController {
     private IArchivoService archivoService;
 
     @POST
-    public Response subirArchivo(ArchivoTo archivo) {
-        this.archivoService.guardar(archivo);
-        return Response.ok().build();
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response subirArchivo(
+            @RestForm("archivo") InputStream fileInputStream,
+            @RestForm("nombre") String nombre,
+            @RestForm("tipo") String tipo) {
+
+        try {
+            byte[] contenido = fileInputStream.readAllBytes(); // Convertir archivo a byte[]
+            fileInputStream.close(); // Cerrar el InputStream para liberar el archivo
+
+            ArchivoTo archivoTo = new ArchivoTo();
+            archivoTo.setNombre(nombre);
+            archivoTo.setTipo(tipo);
+            archivoTo.setContenido(contenido);
+
+            this.archivoService.guardar(archivoTo);
+
+            return Response.ok().build();
+
+        } catch (IOException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al procesar el archivo")
+                    .build();
+        }
     }
 
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM) // Indica que se devuelve un archivo binario
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response descargarArchivo(@PathParam("id") Integer id) {
         ArchivoTo archivo = this.archivoService.buscar(id);
 
@@ -30,9 +58,9 @@ public class ArchivoController {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        return Response.ok(archivo.getContenido()) // Devuelve el archivo en el cuerpo de la respuesta
+        return Response.ok(archivo.getContenido()) // Devuelve archivo en el cuerpo de la respuesta
                 .header("Content-Disposition", "attachment; filename=\"" + archivo.getNombre() + "\"")
-                .type(archivo.getTipo()) // Tipo MIME del archivo (ej. application/pdf)
+                .type(archivo.getTipo()) // Tipo MIME original del archivo
                 .build();
     }
 
@@ -52,20 +80,63 @@ public class ArchivoController {
                 .build();
     }
 
-    /*
-     * 
-@Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @DELETE
+    @Path("/{id}")
+    public Response eliminarArchivo(@PathParam("id") Integer id) {
+        this.archivoService.borrar(id);
+        return Response.noContent().build();
+    }
 
-Esto indica que el endpoint devuelve un archivo binario (útil para cualquier tipo de archivo).
-Response.ok(archivo.getContenido())
+    @GET
+    @Path("/listar")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listarArchivos() {
+        List<ArchivoTo> archivos = archivoService.buscarTodos();
 
-Ahora el cuerpo de la respuesta contiene los datos binarios del archivo.
-header("Content-Disposition", "attachment; filename=...")
+        // Si no hay archivos
+        if (archivos.isEmpty()) {
+            return Response.status(Response.Status.NO_CONTENT).entity("No hay archivos disponibles").build();
+        }
 
-Esto hace que el navegador descargue el archivo en lugar de abrirlo como texto.
-type(archivo.getTipo())
+        // Crear enlaces HATEOAS para cada archivo con la URL completa
+        archivos.forEach(archivo -> {
+            // Usar una ruta relativa, sin el esquema completo (localhost:8080)
+            String downloadUrl = UriBuilder.fromPath("/gestorcontenido/v1.1/archivos/{id}")
+                    .resolveTemplate("id", archivo.getId())
+                    .build()
+                    .toString();
 
-Usa el tipo MIME original del archivo (ej. application/pdf, image/png, etc.).
+            // Agregar el enlace completo al objeto ArchivoTo
+            archivo.setLink(Link.fromUri(downloadUrl).rel("descargar").build());
+        });
 
-     */
+        return Response.ok(archivos).build();
+    }
+
+    @GET
+    @Path("/listarN")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listarArchivosN() {
+        List<ArchivoTo> archivos = archivoService.buscarTodos();
+
+        // Si no hay archivos
+        if (archivos.isEmpty()) {
+            return Response.status(Response.Status.NO_CONTENT).entity("No hay archivos disponibles").build();
+        }
+
+        // Crear enlaces HATEOAS para cada archivo con la URL completa
+        archivos.forEach(archivo -> {
+            // Crear la URL completa para el archivo, asegurando que sea el esquema completo
+            String downloadUrl = UriBuilder.fromUri("/gestorcontenido/v1.1/archivos/descargar")
+                    .queryParam("nombre", archivo.getNombre())
+                    .build()
+                    .toString();
+
+            // Agregar el enlace completo al objeto ArchivoTo
+            archivo.setLink(Link.fromUri(downloadUrl).rel("descargar").build());
+        });
+
+        return Response.ok(archivos).build();
+    }
+
 }

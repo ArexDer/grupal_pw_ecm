@@ -1,11 +1,15 @@
 package grupal1_pw_ecm.uce.edu.web.api.service.to;
 
+import jakarta.ws.rs.core.Link; 
+
 public class ArchivoTo {
     private Integer id;
     private String nombre;
     private String tipo;
     private byte[] contenido;
     private Long carpetaId; 
+
+    private Link link;
 
     public ArchivoTo() {
     }
@@ -65,5 +69,24 @@ public class ArchivoTo {
         this.id = id;
     }
 
+    public Link getLink() {
+        return link;
+    }
+
+    public void setLink(Link link) {
+
+        this.link = link;
+
+    }
+
+    @Override
+    public String toString() {
+        return "ArchivoTo{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", tipo='" + tipo + '\'' +
+                ", link=" + link +
+                '}';
+    }
     
 }

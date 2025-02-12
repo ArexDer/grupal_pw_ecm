@@ -1,10 +1,14 @@
 package grupal1_pw_ecm.uce.edu.web.api.service;
 
+import java.util.List;
+import java.util.function.Function;
+
 import grupal1_pw_ecm.uce.edu.web.api.repository.IArchivoRepository;
 import grupal1_pw_ecm.uce.edu.web.api.repository.modelo.Archivo;
 import grupal1_pw_ecm.uce.edu.web.api.service.to.ArchivoTo;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class ArchivoServiceImpl implements IArchivoService {
@@ -13,12 +17,14 @@ public class ArchivoServiceImpl implements IArchivoService {
     private IArchivoRepository archivoRepository;
 
     @Override
+    @Transactional
     public void guardar(ArchivoTo archivoTo) {
         Archivo archivo = convertir(archivoTo);
         archivoRepository.insertar(archivo);
     }
 
     @Override
+    @Transactional
     public ArchivoTo buscar(int id) {
         Archivo archivo = archivoRepository.seleccionar(id);
         if (archivo == null) {
@@ -28,6 +34,7 @@ public class ArchivoServiceImpl implements IArchivoService {
     }
 
     @Override
+    @Transactional
     public ArchivoTo buscarNombre(String nombre) {
         Archivo archivo = archivoRepository.seleccionarNombre(nombre);
         if (archivo == null) {
@@ -36,7 +43,6 @@ public class ArchivoServiceImpl implements IArchivoService {
         return convertirTO(archivo);
     }
 
-    // Métodos privados para convertir entre Archivo y ArchivoTO
     private Archivo convertir(ArchivoTo archivoTO) {
         Archivo archivo = new Archivo();
         archivo.setNombre(archivoTO.getNombre());
@@ -53,4 +59,24 @@ public class ArchivoServiceImpl implements IArchivoService {
         archivoTO.setContenido(archivo.getContenido());
         return archivoTO;
     }
+
+    @Override
+    @Transactional
+    public void borrar(Integer id) {
+        this.archivoRepository.eliminar(id);
+    }
+
+    Function<List<Archivo>, List<ArchivoTo>> convertirTOs = (archivos) -> {
+        return archivos.stream().map(archivo -> convertirTO(archivo)).toList();
+    };
+
+    @Override
+    @Transactional
+    public List<ArchivoTo> buscarTodos() {
+        return convertirTOs.apply(this.archivoRepository.seleccionarTodos());
+    }
+
+    
+
+
 }

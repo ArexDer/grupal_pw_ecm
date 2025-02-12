@@ -15,14 +15,39 @@ public class CarpetaServiceImpl implements ICarpetaService {
     private ICarpetaRepository iCarpetaRepository;
 
     private Function<Carpeta, CarpetaTo> mapTo = c -> {
-        CarpetaTo cTo = new CarpetaTo(c.getId(), c.getNombre());
-        return cTo;
+        List<CarpetaTo> subcarpetasTo = (c.getSubcarpetas() != null) ? 
+            c.getSubcarpetas().stream().map(this.mapTo).toList() : null;
+    
+        return new CarpetaTo(
+            c.getId(),
+            c.getNombre(),
+            (c.getCarpetaPadre() != null) ? c.getCarpetaPadre().getId() : null, // ID de la carpeta padre
+            subcarpetasTo // Lista de subcarpetas
+        );
     };
+    
 
     private Function<CarpetaTo, Carpeta> mapCarpeta = cTo -> {
-        Carpeta c = new Carpeta(cTo.getId(), cTo.getNombre());
-        return c;
+        Carpeta carpeta = new Carpeta();
+        carpeta.setId(cTo.getId());
+        carpeta.setNombre(cTo.getNombre());
+    
+        // Si la carpeta padre existe, se crea un objeto Carpeta con solo el ID
+        if (cTo.getCarpetaPadreId() != null) {
+            Carpeta carpetaPadre = new Carpeta();
+            carpetaPadre.setId(cTo.getCarpetaPadreId());
+            carpeta.setCarpetaPadre(carpetaPadre);
+        }
+    
+        // Convertir subcarpetasTo a subcarpetas reales
+        if (cTo.getSubcarpetas() != null) {
+            List<Carpeta> subcarpetas = cTo.getSubcarpetas().stream().map(this.mapCarpeta).toList();
+            carpeta.setSubcarpetas(subcarpetas);
+        }
+    
+        return carpeta;
     };
+    
 
     @Override
     public CarpetaTo buscarPorId(Integer id) {

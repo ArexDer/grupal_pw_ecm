@@ -13,7 +13,6 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "archivo")
-
 public class Archivo {
 
     @Id
@@ -29,7 +28,7 @@ public class Archivo {
     private String tipo;
 
     @Lob
-    @Column(name = "arch_contenido", columnDefinition = "BYTEA")
+    @Column(name = "arch_contenido")
     private byte[] contenido;
 
     @ManyToOne
