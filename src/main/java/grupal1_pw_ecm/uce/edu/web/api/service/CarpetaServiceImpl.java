@@ -27,26 +27,26 @@ public class CarpetaServiceImpl implements ICarpetaService {
         );
     };
 
-    private Function<CarpetaTo, Carpeta> mapCarpeta = cTo -> {
-        Carpeta carpeta = new Carpeta();
-        carpeta.setId(cTo.getId());
-        carpeta.setNombre(cTo.getNombre());
+    // private Function<CarpetaTo, Carpeta> mapCarpeta = cTo -> {
+    //     Carpeta carpeta = new Carpeta();
+    //     carpeta.setId(cTo.getId());
+    //     carpeta.setNombre(cTo.getNombre());
 
-        // Si la carpeta padre existe, se crea un objeto Carpeta con solo el ID
-        if (cTo.getCarpetaPadreId() != null) {
-            Carpeta carpetaPadre = new Carpeta();
-            carpetaPadre.setId(cTo.getCarpetaPadreId());
-            carpeta.setCarpetaPadre(carpetaPadre);
-        }
+    //     // Si la carpeta padre existe, se crea un objeto Carpeta con solo el ID
+    //     if (cTo.getCarpetaPadreId() != null) {
+    //         Carpeta carpetaPadre = new Carpeta();
+    //         carpetaPadre.setId(cTo.getCarpetaPadreId());
+    //         carpeta.setCarpetaPadre(carpetaPadre);
+    //     }
 
-        // Convertir subcarpetasTo a subcarpetas reales
-        if (cTo.getSubcarpetas() != null) {
-            List<Carpeta> subcarpetas = cTo.getSubcarpetas().stream().map(this.mapCarpeta).toList();
-            carpeta.setSubcarpetas(subcarpetas);
-        }
+    //     // Convertir subcarpetasTo a subcarpetas reales
+    //     if (cTo.getSubcarpetas() != null) {
+    //         List<Carpeta> subcarpetas = cTo.getSubcarpetas().stream().map(this.mapCarpeta).toList();
+    //         carpeta.setSubcarpetas(subcarpetas);
+    //     }
 
-        return carpeta;
-    };
+    //     return carpeta;
+    // };
 
     @Override
     public CarpetaTo buscarPorId(Integer id) {
