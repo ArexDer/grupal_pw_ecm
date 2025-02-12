@@ -4,7 +4,6 @@ import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import grupal1_pw_ecm.uce.edu.web.api.repository.modelo.Carpeta;
@@ -23,8 +22,9 @@ public class CarpetaRepositoryImpl implements ICarpetaRepository {
 
     @Override
     public List<Carpeta> buscarTodos() {
-        TypedQuery<Carpeta> myQuery =this.entityManager.createQuery("SELECT c from Carpeta c", Carpeta.class);
-        return myQuery.getResultList();
+        return entityManager.createQuery(
+                "SELECT c FROM Carpeta c LEFT JOIN FETCH c.subcarpetas", Carpeta.class)
+                .getResultList();
     }
 
     @Override
@@ -32,10 +32,10 @@ public class CarpetaRepositoryImpl implements ICarpetaRepository {
         this.entityManager.persist(carpeta);
     }
 
-    /*@Override
+    @Override
     public void actualizar(Carpeta carpeta) {
         this.entityManager.merge(carpeta);
-    }*/
+    }
 
     @Override
     public void eliminar(Integer id) {

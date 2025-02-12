@@ -3,10 +3,17 @@ package grupal1_pw_ecm.uce.edu.web.api.service.to;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CarpetaTo implements Serializable {
+
+     @JsonProperty("id")
     private Integer id;
+    @JsonProperty("nombre")
     private String nombre;
+    @JsonProperty("carpeta_padre_id")
     private Integer carpetaPadreId; // ID de la carpeta padre
+    @JsonProperty("subcarpetas")
     private List<CarpetaTo> subcarpetas; // Lista de subcarpetas
 
     private static final long serialVersionUID = -1544399202104638172L;
@@ -21,7 +28,7 @@ public class CarpetaTo implements Serializable {
         this.subcarpetas = subcarpetas;
     }
 
-    // GETTERS Y SETTERS
+    // Getters y Setters
     public Integer getId() {
         return id;
     }

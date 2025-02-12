@@ -15,33 +15,32 @@ public class Carpeta {
     @Column(name = "carp_nombre")
     private String nombre;
 
-    // Relación con el usuario (dueño de la carpeta)
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
-    
-    // Relación con archivos dentro de la carpeta
-    @OneToMany(mappedBy = "carpeta", cascade = CascadeType.ALL)
-    private List<Archivo> archivos;
+    private Usuario usuario;  // Relación con Usuario
 
-    // Autorreferencia: Carpeta padre
+    @OneToMany(mappedBy = "carpeta", cascade = CascadeType.ALL)
+    private List<Archivo> archivos;  // Relación con Archivos
+
     @ManyToOne
     @JoinColumn(name = "carp_padre_id")
-    private Carpeta carpetaPadre;
+    private Carpeta carpetaPadre;  // Relación con Carpeta Padre
 
-    // Lista de subcarpetas
-    @OneToMany(mappedBy = "carpetaPadre", cascade = CascadeType.ALL)
-    private List<Carpeta> subcarpetas;
+    @OneToMany(fetch = FetchType.EAGER ,mappedBy = "carpetaPadre")
+    private List<Carpeta> subcarpetas;  // Relación recursiva para subcarpetas
 
     // Constructor vacío
     public Carpeta() {
     }
 
-    // Constructor con parámetros
-    public Carpeta(Integer id, String nombre, Carpeta carpetaPadre) {
+    public Carpeta(Integer id, String nombre, Usuario usuario, List<Archivo> archivos, Carpeta carpetaPadre,
+            List<Carpeta> subcarpetas) {
         this.id = id;
         this.nombre = nombre;
+        this.usuario = usuario;
+        this.archivos = archivos;
         this.carpetaPadre = carpetaPadre;
+        this.subcarpetas = subcarpetas;
     }
 
     // Getters y Setters

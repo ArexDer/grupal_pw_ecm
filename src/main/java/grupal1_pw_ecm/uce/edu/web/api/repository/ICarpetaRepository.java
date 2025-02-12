@@ -11,7 +11,7 @@ public interface ICarpetaRepository {
     
     public void insertar(Carpeta carpeta);
 
-    //void actualizar(Carpeta carpeta);
+    public void actualizar(Carpeta carpeta);
 
     public void eliminar(Integer id);
 }

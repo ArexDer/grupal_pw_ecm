@@ -11,7 +11,7 @@ public interface ICarpetaService {
 
     public void guardar(CarpetaTo carpeta);
 
-    //public void actualizar(CarpetaTo carpeta);
+    public void actualizar(CarpetaTo carpeta);
 
     public void borrar(Integer id);
 }
