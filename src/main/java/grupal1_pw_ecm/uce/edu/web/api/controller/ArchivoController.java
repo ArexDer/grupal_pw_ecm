@@ -53,8 +53,13 @@ public class ArchivoController {
 
             archivoTo.setCarpeta(carpetaTo); // Asignar la instancia de CarpetaTo
 
-            System.err.println(archivoTo.getCarpeta().getId()
-                    + " " + archivoTo.getNombre() + " " + archivoTo.getTipo());
+            if (archivoTo.getCarpeta() != null) {
+                System.err.println(archivoTo.getCarpeta().getId()
+                        + " " + archivoTo.getNombre() + " " + archivoTo.getTipo());
+            } else {
+                System.err.println("La carpeta es null");
+            }
+
             this.archivoService.guardar(archivoTo);
 
             return Response.ok().build();
