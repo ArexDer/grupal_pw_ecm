@@ -17,4 +17,6 @@ public interface IArchivoService {
 
     public List<ArchivoTo> buscarTodos();
 
+    public List<ArchivoTo> buscarPorCarpeta(Integer carpeta);
+
 }

@@ -17,6 +17,8 @@ public interface IArchivoRepository {
 
     public void eliminar(Integer id);
 
+    public List<Archivo> seleccionarPorCarpeta(Integer carpetaId);
+
     
     
 }

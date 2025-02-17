@@ -25,10 +25,11 @@ public class CarpetaController {
     private ICarpetaService iCarpetaService;
 
     @GET
-    @Path("/{id}")
+    @Path("/{nombre}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response buscarPorId(@PathParam("id") Integer id) {
-        CarpetaTo carpeta = this.iCarpetaService.buscarPorId(id);
+    //http://localhost:8081/gestorcontenido/v1.1/carpetas/nombre
+    public Response buscarPorNombre(@PathParam("nombre") String nombre) {
+        CarpetaTo carpeta = this.iCarpetaService.buscarNombre(nombre);
         if (carpeta != null) {
             return Response.ok(carpeta).build();
         } else {

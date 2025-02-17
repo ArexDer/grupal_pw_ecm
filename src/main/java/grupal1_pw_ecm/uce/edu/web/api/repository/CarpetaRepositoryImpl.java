@@ -41,4 +41,10 @@ public class CarpetaRepositoryImpl implements ICarpetaRepository {
     public void eliminar(Integer id) {
         this.entityManager.remove(this.buscarPorId(id));
     }
+
+    @Override
+    public Carpeta buscarNombre(String nombre) {
+        return entityManager.createQuery("SELECT c FROM Carpeta c WHERE c.nombre = :nombre", Carpeta.class)
+                .setParameter("nombre", nombre).getSingleResult();
+    }
 }

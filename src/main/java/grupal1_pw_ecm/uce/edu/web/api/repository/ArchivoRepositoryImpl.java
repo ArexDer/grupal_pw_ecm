@@ -60,4 +60,16 @@ public class ArchivoRepositoryImpl implements IArchivoRepository {
         }
     }
 
+    @Override
+    public List<Archivo> seleccionarPorCarpeta(Integer carpetaId) {
+        try {
+            TypedQuery<Archivo> query = entityManager.createQuery(
+                    "SELECT a FROM Archivo a WHERE a.carpeta.id = :carpetaId",
+                    Archivo.class);
+            query.setParameter("carpetaId", carpetaId);
+            return query.getResultList();
+        } catch (NoResultException e) {
+            return null; // Manejo de excepción para evitar errores si no se encuentra el archivo
+        }
+    }
 }

@@ -14,4 +14,6 @@ public interface ICarpetaService {
     public void actualizar(CarpetaTo carpeta);
 
     public void borrar(Integer id);
+
+    public CarpetaTo buscarNombre(String nombre);
 }

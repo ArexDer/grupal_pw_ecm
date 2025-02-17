@@ -14,4 +14,6 @@ public interface ICarpetaRepository {
     public void actualizar(Carpeta carpeta);
 
     public void eliminar(Integer id);
+
+    public Carpeta buscarNombre(String nombre);
 }

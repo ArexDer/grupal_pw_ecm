@@ -7,14 +7,16 @@ public class ArchivoTo {
     private String nombre;
     private String tipo;
     private byte[] contenido;
-    private Long carpetaId; 
+    private Integer carpetaId; 
 
     private Link link;
+
+    private CarpetaTo carpeta;
 
     public ArchivoTo() {
     }
 
-    public ArchivoTo(Integer id,String nombre, String tipo, byte[] contenido, Long carpetaId) {
+    public ArchivoTo(Integer id,String nombre, String tipo, byte[] contenido, Integer carpetaId) {
         this.id = id;
         this.nombre = nombre;
         this.tipo = tipo;
@@ -53,11 +55,11 @@ public class ArchivoTo {
         this.contenido = contenido;
     }
 
-    public Long getCarpetaId() {
+    public Integer getCarpetaId() {
         return carpetaId;
     }
 
-    public void setCarpetaId(Long carpetaId) {
+    public void setCarpetaId(Integer carpetaId) {
         this.carpetaId = carpetaId;
     }
 
@@ -77,6 +79,14 @@ public class ArchivoTo {
 
         this.link = link;
 
+    }
+
+    public CarpetaTo getCarpeta() {
+        return carpeta;
+    }
+
+    public void setCarpeta(CarpetaTo carpeta) {
+        this.carpeta = carpeta;
     }
 
     @Override

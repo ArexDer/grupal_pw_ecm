@@ -1,25 +1,36 @@
 package grupal1_pw_ecm.uce.edu.web.api.controller;
 
-import grupal1_pw_ecm.uce.edu.web.api.service.IArchivoService;
-import grupal1_pw_ecm.uce.edu.web.api.service.to.ArchivoTo;
-import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
-import jakarta.ws.rs.core.Link;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 import org.jboss.resteasy.reactive.RestForm;
 
+import grupal1_pw_ecm.uce.edu.web.api.service.CarpetaServiceImpl;
+import grupal1_pw_ecm.uce.edu.web.api.service.IArchivoService;
+import grupal1_pw_ecm.uce.edu.web.api.service.to.ArchivoTo;
+import grupal1_pw_ecm.uce.edu.web.api.service.to.CarpetaTo;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+
 @Path("/archivos")
 public class ArchivoController {
 
     @Inject
     private IArchivoService archivoService;
+    @Inject
+    private CarpetaServiceImpl carpetaService;
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -27,7 +38,8 @@ public class ArchivoController {
     public Response subirArchivo(
             @RestForm("archivo") InputStream fileInputStream,
             @RestForm("nombre") String nombre,
-            @RestForm("tipo") String tipo) {
+            @RestForm("tipo") String tipo,
+            @RestForm("carpeta") String carpeta) {
 
         try {
             byte[] contenido = fileInputStream.readAllBytes(); // Convertir archivo a byte[]
@@ -37,7 +49,12 @@ public class ArchivoController {
             archivoTo.setNombre(nombre);
             archivoTo.setTipo(tipo);
             archivoTo.setContenido(contenido);
+            CarpetaTo carpetaTo = carpetaService.buscarNombre(carpeta);
 
+            archivoTo.setCarpeta(carpetaTo); // Asignar la instancia de CarpetaTo
+
+            System.err.println(archivoTo.getCarpeta().getId()
+                    + " " + archivoTo.getNombre() + " " + archivoTo.getTipo());
             this.archivoService.guardar(archivoTo);
 
             return Response.ok().build();
@@ -90,8 +107,20 @@ public class ArchivoController {
     @GET
     @Path("/listar")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listarArchivos() {
-        List<ArchivoTo> archivos = archivoService.buscarTodos();
+    // http://localhost:8081/gestorcontenido/v1.1/archivos/listar?carpeta=nombre
+    public Response listarArchivos(@QueryParam("carpeta") String carpeta) {
+        List<ArchivoTo> archivos;
+
+        if (carpeta != null && !carpeta.isEmpty()) {
+            CarpetaTo carpetaTo = this.carpetaService.buscarNombre(carpeta);
+            if (carpetaTo == null) {
+                return Response.status(Response.Status.NOT_FOUND).entity("Carpeta no encontrada").build();
+            }
+            Integer carpetaId = carpetaTo.getId();
+            archivos = archivoService.buscarPorCarpeta(carpetaId);
+        } else {
+            archivos = archivoService.buscarTodos();
+        }
 
         // Si no hay archivos
         if (archivos.isEmpty()) {
