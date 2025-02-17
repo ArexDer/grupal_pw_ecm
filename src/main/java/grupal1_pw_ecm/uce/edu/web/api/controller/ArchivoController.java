@@ -39,7 +39,7 @@ public class ArchivoController {
             @RestForm("archivo") InputStream fileInputStream,
             @RestForm("nombre") String nombre,
             @RestForm("tipo") String tipo,
-            @RestForm("carpeta") String carpeta) {
+            @RestForm("carpeta") Long carpetaId) {
 
         try {
             byte[] contenido = fileInputStream.readAllBytes(); // Convertir archivo a byte[]
@@ -49,7 +49,13 @@ public class ArchivoController {
             archivoTo.setNombre(nombre);
             archivoTo.setTipo(tipo);
             archivoTo.setContenido(contenido);
-            CarpetaTo carpetaTo = carpetaService.buscarNombre(carpeta);
+            CarpetaTo carpetaTo = carpetaService.buscarPorId(carpetaId.intValue());
+            if (carpetaTo == null) {
+                // Si la carpeta no existe en la base de datos
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("La carpeta especificada no existe en el sistema.")
+                        .build();
+            }
 
             archivoTo.setCarpeta(carpetaTo); // Asignar la instancia de CarpetaTo
 
