@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import grupal1_pw_ecm.uce.edu.web.api.repository.modelo.Carpeta;
@@ -40,5 +41,17 @@ public class CarpetaRepositoryImpl implements ICarpetaRepository {
     @Override
     public void eliminar(Integer id) {
         this.entityManager.remove(this.buscarPorId(id));
+    }
+
+    @Override
+    public List<Carpeta> buscarIdPadre(Integer id) {
+        if (id == null) {
+            return this.entityManager.createQuery("SELECT c FROM Carpeta c WHERE c.carpetaPadre IS NULL", Carpeta.class)
+                    .getResultList();
+        } else {
+            return this.entityManager.createQuery("SELECT c FROM Carpeta c WHERE c.carpetaPadre.id = :id", Carpeta.class)
+                    .setParameter("id", id)
+                    .getResultList();
+        }
     }
 }

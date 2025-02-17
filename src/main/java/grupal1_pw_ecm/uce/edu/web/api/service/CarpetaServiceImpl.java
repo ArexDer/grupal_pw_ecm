@@ -108,4 +108,10 @@ public class CarpetaServiceImpl implements ICarpetaService {
         }
     }
 
+    @Override
+    public List<CarpetaTo> buscarIdPadre(Integer id) {
+        List<Carpeta> carpetas = this.iCarpetaRepository.buscarIdPadre(id);
+        return carpetas.stream().map(this.mapTo).toList();
+    }
+
 }

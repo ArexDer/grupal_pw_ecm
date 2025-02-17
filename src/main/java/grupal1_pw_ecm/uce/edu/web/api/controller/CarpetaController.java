@@ -13,6 +13,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -69,5 +70,13 @@ public class CarpetaController {
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+    }
+
+    @GET
+    @Path("/porIdPadre")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<CarpetaTo> buscarIdPadre(@QueryParam("id") String  id) {
+        Integer idInt = (id == null || id.equalsIgnoreCase("null")) ? null : Integer.valueOf(id);
+        return this.iCarpetaService.buscarIdPadre(idInt);
     }
 }

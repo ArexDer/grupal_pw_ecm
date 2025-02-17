@@ -91,7 +91,5 @@ public class Archivo {
     public void setCarpeta(Carpeta carpeta) {
         this.carpeta = carpeta;
     }
-
-    
     
 }

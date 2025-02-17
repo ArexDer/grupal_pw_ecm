@@ -2,6 +2,7 @@ package grupal1_pw_ecm.uce.edu.web.api.controller;
 
 import grupal1_pw_ecm.uce.edu.web.api.service.IArchivoService;
 import grupal1_pw_ecm.uce.edu.web.api.service.to.ArchivoTo;
+import grupal1_pw_ecm.uce.edu.web.api.service.to.CarpetaTo;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -27,16 +28,24 @@ public class ArchivoController {
     public Response subirArchivo(
             @RestForm("archivo") InputStream fileInputStream,
             @RestForm("nombre") String nombre,
-            @RestForm("tipo") String tipo) {
+            @RestForm("tipo") String tipo,
+            @RestForm("carpetaId") String carpetaId) {
 
         try {
             byte[] contenido = fileInputStream.readAllBytes(); // Convertir archivo a byte[]
             fileInputStream.close(); // Cerrar el InputStream para liberar el archivo
 
+            Integer carpetaIdInt = null;
+
+            if (!carpetaId.equals("null")) {
+                carpetaIdInt = Integer.valueOf(carpetaId);
+            }
+
             ArchivoTo archivoTo = new ArchivoTo();
             archivoTo.setNombre(nombre);
             archivoTo.setTipo(tipo);
             archivoTo.setContenido(contenido);
+            archivoTo.setCarpetaId(carpetaIdInt);
 
             this.archivoService.guardar(archivoTo);
 
@@ -137,6 +146,14 @@ public class ArchivoController {
         });
 
         return Response.ok(archivos).build();
+    }
+
+    @GET
+    @Path("/porIdCarpeta")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<ArchivoTo> buscarIdCarpeta(@QueryParam("id") String id) {
+        Integer idInt = (id == null || id.equalsIgnoreCase("null")) ? null : Integer.valueOf(id);
+        return this.archivoService.buscarIdCarpeta(idInt);
     }
 
 }

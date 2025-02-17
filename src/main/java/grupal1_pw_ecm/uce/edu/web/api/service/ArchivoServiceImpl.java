@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.function.Function;
 
 import grupal1_pw_ecm.uce.edu.web.api.repository.IArchivoRepository;
+import grupal1_pw_ecm.uce.edu.web.api.repository.ICarpetaRepository;
 import grupal1_pw_ecm.uce.edu.web.api.repository.modelo.Archivo;
+import grupal1_pw_ecm.uce.edu.web.api.repository.modelo.Carpeta;
 import grupal1_pw_ecm.uce.edu.web.api.service.to.ArchivoTo;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -15,6 +17,9 @@ public class ArchivoServiceImpl implements IArchivoService {
 
     @Inject
     private IArchivoRepository archivoRepository;
+
+    @Inject
+    private ICarpetaRepository carpetaRepository;
 
     @Override
     @Transactional
@@ -48,6 +53,12 @@ public class ArchivoServiceImpl implements IArchivoService {
         archivo.setNombre(archivoTO.getNombre());
         archivo.setTipo(archivoTO.getTipo());
         archivo.setContenido(archivoTO.getContenido());
+    
+        if (archivoTO.getCarpetaId() != null) {
+            Carpeta carpeta = this.carpetaRepository.buscarPorId(archivoTO.getCarpetaId());
+            archivo.setCarpeta(carpeta);
+        }
+    
         return archivo;
     }
 
@@ -76,7 +87,10 @@ public class ArchivoServiceImpl implements IArchivoService {
         return convertirTOs.apply(this.archivoRepository.seleccionarTodos());
     }
 
-    
+    @Override
+    public List<ArchivoTo> buscarIdCarpeta(Integer id) {
 
+        return convertirTOs.apply(this.archivoRepository.buscarIdCarpeta(id));
+    }
 
 }

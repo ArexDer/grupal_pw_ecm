@@ -3,6 +3,7 @@ package grupal1_pw_ecm.uce.edu.web.api.repository;
 import java.util.List;
 
 import grupal1_pw_ecm.uce.edu.web.api.repository.modelo.Archivo;
+import grupal1_pw_ecm.uce.edu.web.api.repository.modelo.Carpeta;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -60,4 +61,15 @@ public class ArchivoRepositoryImpl implements IArchivoRepository {
         }
     }
 
+    @Override
+    public List<Archivo> buscarIdCarpeta(Integer id) {
+         if (id == null) {
+            return this.entityManager.createQuery("SELECT a FROM Archivo a WHERE a.carpeta IS NULL", Archivo.class)
+                    .getResultList();
+        } else {
+            return this.entityManager.createQuery("SELECT a FROM Archivo a WHERE a.carpeta.id = :id", Archivo.class)
+                    .setParameter("id", id)
+                    .getResultList();
+        }
+    }
 }
